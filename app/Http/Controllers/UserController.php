@@ -8,6 +8,10 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public function logout(){
+        auth()->logout();
+        return redirect('/')->with('success', 'You are now logged out.');
+    }
     public function showCorrectHomepage(){
         if(auth()->check()){
             return view('homepage-feed');
@@ -24,9 +28,9 @@ class UserController extends Controller
         if(auth()->attempt(['username' => $incomingFields['loginusername'], 'password' => $incomingFields['loginpassword']])){
             //creates session value through cookie
             $request->session()->regenerate();
-            return "Congrats!";
+            return redirect('/')->with('success','You have successfully logged in.');
         }else {
-            return 'sorry!';
+            return redirect('/')->with('failure','Invalid login.');
         }
     }
     public function register(Request $request) {
@@ -38,7 +42,9 @@ class UserController extends Controller
         //hashing the password
         $incomingFields['password'] = bcrypt($incomingFields['password']);
         //creates a new record in the database
-        User::create($incomingFields);
-        return 'hello from register func';
+        $user = User::create($incomingFields);
+        //logins a new user
+        auth()->login($user);
+        return redirect('/')->with('success','Thank you for creating an account');
     }
 }
