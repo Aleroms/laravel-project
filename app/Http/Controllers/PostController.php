@@ -8,6 +8,26 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+    public function actuallyUpdate(Post $post, Request $request){
+        $incomingFields = $request->validate([
+            'title' => 'required',
+            'body' => 'required'
+        ]);
+
+        $incomingFields['title'] = strip_tags($incomingFields['title']);
+        $incomingFields['body'] = strip_tags($incomingFields['body']);
+
+        $post->update($incomingFields);
+        return back()->with('success', 'Post successfully updated.');
+    }
+    public function showEditForm(Post $post){
+        return view('edit-post',['post' => $post]);
+    }
+    public function delete(Post $post){
+        //routes file handles middleware to check if can delete post
+        $post->delete();
+        return redirect('/profile/' . auth()->user()->username)->with('success', 'Post sucessfully deleted');
+    }
     public function viewSinglePost(Post $post){
         $ourHTML = strip_tags(Str::markdown($post->body),'<p><ul><ol><strong><em><h3><br>');
         $post['body'] = $ourHTML;
