@@ -14,12 +14,17 @@ use App\Http\Controllers\UserController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/admins-only', function(){
+    return 'only admins can see this';
+})->middleware('can:visitAdminPages');
 
 //user related routes
 Route::get('/', [UserController::class,"showCorrectHomepage"])->name('login');
 Route::post('/register',[UserController::class,'register'])->middleware('guest');
 Route::post('/login',[UserController::class,'login'])->middleware('guest');
 Route::post('/logout',[UserController::class,'logout'])->middleware('mustBeLoggedIn');
+Route::get('/manage-avatar',[UserController::class,'showAvatarForm']);
+Route::post('/manage-avatar',[UserController::class,'storeAvatar']);
 
 //blog post related routes
 Route::get('/create-post',[PostController::class,'showCreateForm'])->middleware('mustBeLoggedIn');
