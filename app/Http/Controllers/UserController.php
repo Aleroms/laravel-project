@@ -20,6 +20,17 @@ class UserController extends Controller
         //converts user's image into a reshaped 120x120px jpg
         $imgData = Image::make($request->file('avatar'))->fit(120)->encode('jpg');
         Storage::put('public/avatars/' . $filename, $imgData);
+
+        $oldAvatar = $user->avatar;
+
+        //updates database
+        $user->avatar = $filename;
+        $user->save();
+
+        if($oldAvatar != "/fallback-avatar.jpg"){
+            Storage::delete(str_replace('/storage/','public/',$oldAvatar));
+        }
+        return back()->with('success', 'successfully uploaded');
     }
     public function showAvatarForm(){
         return view('avatar-form');
@@ -30,7 +41,8 @@ class UserController extends Controller
         return view('profile-posts', [
             'username' => $user->username, 
             'posts' => $user->posts()->latest()->get(),
-            'postCount' => $user->posts()->count()
+            'postCount' => $user->posts()->count(),
+            'avatar' => $user->avatar
         ]);
     }
     public function logout(){
