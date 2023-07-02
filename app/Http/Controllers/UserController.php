@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Follow;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\View;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,7 +16,7 @@ class UserController extends Controller
         $request->validate([
             'avatar' => 'required|image|max:3000'
         ]);
-
+        
         $user = auth()->user();
         $filename = $user->id . '-' . uniqid() . '.jpg';
         //converts user's image into a reshaped 120x120px jpg
@@ -36,19 +37,41 @@ class UserController extends Controller
     public function showAvatarForm(){
         return view('avatar-form');
     }
-    public function profile(User $user){
+    //cannot be called from routes file
+    private function getSharedData(User $user){
         $currentlyFollowing = 0;
 
         if(auth()->check()){
             $currentlyFollowing = Follow::where([['user_id','=',auth()->user()->id],['followeduser','=',$user->id]])->count();
         }
-        //arrow looks for username property
-        return view('profile-posts', [
-            'username' => $user->username, 
-            'posts' => $user->posts()->latest()->get(),
+
+        View::share('sharedData',[
+            'username' => $user->username,
             'postCount' => $user->posts()->count(),
             'avatar' => $user->avatar,
             'currentlyFollowing' => $currentlyFollowing
+        ]);
+    }
+
+    public function profile(User $user){
+        $this->getSharedData($user);
+        //arrow looks for username property
+        return view('profile-posts', [
+            'posts' => $user->posts()->latest()->get()
+        ]);
+    }
+    public function profileFollowers(User $user){
+        $this->getSharedData($user);
+        //arrow looks for username property
+        return view('profile-followers', [
+            'posts' => $user->posts()->latest()->get()
+        ]);
+    }
+    public function profileFollowing(User $user){
+        $this->getSharedData($user);
+        //arrow looks for username property
+        return view('profile-following', [
+            'posts' => $user->posts()->latest()->get()
         ]);
     }
     public function logout(){
