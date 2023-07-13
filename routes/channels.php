@@ -18,9 +18,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('chatchannel', function(){
-    //return auth()->check();
-    if(auth()->check()){
-        return true;
-    }
-    return false;
+    //verified users are the only ones allowed in private chatchannel
+    return auth()->check();
 });
