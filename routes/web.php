@@ -1,9 +1,11 @@
 <?php
 
+use App\Events\ChatMessage;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FollowController;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,3 +46,23 @@ Route::get('/profile/{user:username}/following',[UserController::class,'profileF
 //follow related routes
 Route::post('/create-follow/{user:username}',[FollowController::class,'createFollow'])->middleware('mustBeLoggedIn');;
 Route::post('/remove-follow/{user:username}',[FollowController::class,'removeFollow'])->middleware('mustBeLoggedIn');;
+
+//chat related routes
+Route::post('/send-chat-message',function(Request $request){
+    $formFields = $request->validate([
+        'textvalue' => 'required'
+    ]);
+    if(!trim(strip_tags($formFields['textvalue']))){
+        return response()->noContent();
+    }
+
+    //broadcast to users
+    broadcast(new ChatMessage([
+        'username' => auth()->user()->username,
+        'textvalue' => strip_tags($request->textvalue),
+        'avatar' => auth()->user()->avatar
+    ]))->toOthers();
+
+    return response()->noContent();
+    
+})->middleware('mustBeLoggedIn');
