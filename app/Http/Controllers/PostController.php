@@ -35,6 +35,11 @@ class PostController extends Controller
         $post->delete();
         return redirect('/profile/' . auth()->user()->username)->with('success', 'Post sucessfully deleted');
     }
+    public function deleteAPI(Post $post){
+        //routes file handles middleware to check if can delete post
+        $post->delete();
+        return 'blue label de johnny walker';
+    }
     public function viewSinglePost(Post $post){
         $ourHTML = strip_tags(Str::markdown($post->body),'<p><ul><ol><strong><em><h3><br>');
         $post['body'] = $ourHTML;
@@ -64,5 +69,26 @@ class PostController extends Controller
         ]));
         
         return redirect("/post/{$newPost->id}")->with('success',  'New post sucessfully created');
+    }
+    public function storeNewPostAPI(Request $request){
+        $incomingFields = $request->validate([
+            'title' => 'required',
+            'body' => 'required'
+        ]);
+
+        $incomingFields['title'] = strip_tags($incomingFields['title']);
+        $incomingFields['body'] = strip_tags($incomingFields['body']);
+        $incomingFields['user_id'] = auth()->id();
+
+        $newPost = Post::create($incomingFields);
+
+        //sending email
+        dispatch(new SendNewPostEmail([
+            'sendTo' => auth()->user()->email,
+            'name' => auth()->user()->username,
+            'title' => $newPost->title
+        ]));
+        
+        return $newPost->id;
     }
 }

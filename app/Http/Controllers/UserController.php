@@ -103,6 +103,7 @@ class UserController extends Controller
             'docTitle' => 'Who ' . $user->username . " Follows"
         ]);
     }
+    
     public function logout(){
         event(new OurExampleEvent([
             'username' => auth()->user()->username,
@@ -124,6 +125,19 @@ class UserController extends Controller
                 'postCount' => 39
             ]);
         }
+    }
+    public function loginAPI(Request $request){
+        $incomingFields = $request->validate([
+            'username' => 'required',
+            'password' => 'required'
+        ]);
+        //only returns true if it is a valid username/pw
+        if(auth()->attempt($incomingFields)){
+            $user = User::where('username',$incomingFields['username'])->first();
+            $token = $user->createToken('apptocken')->plainTextToken;
+            return $token;
+        }
+        return 'srry';
     }
     public function login(Request $request){
         $incomingFields = $request->validate([
