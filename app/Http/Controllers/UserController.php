@@ -115,7 +115,9 @@ class UserController extends Controller
                 'posts' => auth()->user()->feedPosts()->latest()->paginate(8)
             ]);
         }else{
-            return view('homepage');
+            return view('homepage',[
+                'postCount' => 39
+            ]);
         }
     }
     public function login(Request $request){
