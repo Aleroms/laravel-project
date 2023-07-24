@@ -2,8 +2,8 @@
   <div class="container py-md-5">
       <div class="row align-items-center">
         <div class="col-lg-7 py-3 py-md-5">
-          <h1 class="display-3">Remember Writing?</h1>
-          <p class="lead text-muted">Are you sick of short tweets and impersonal &ldquo;shared&rdquo; posts that are reminiscent of the late 90&rsquo;s email forwards? We believe getting back to actually writing is the key to enjoying the internet again.
+          <h1 class="display-3">MovieVerse Journals</h1>
+          <p class="lead text-muted">Welcome to MovieVerse Journals, the ultimate destination for movie enthusiasts! Users can share their thoughts, opinions, and reviews about their favorite films and cinematic experiences. Members can easily publish engaging blog posts, sparking conversation and debates within the vibrant movie-loving community. Join the excitement today!
           Our users have authored {{$postCount}} posts.
           </p>
         </div>
